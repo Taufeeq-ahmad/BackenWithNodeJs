@@ -2,25 +2,38 @@
 
 const express = require('express');
 const noteModel = require('./models/note.model');
+const postModel = require('./models/post.model');
+const multer = require('multer');
+const uploadImage = require('./service/storage.service');
 const app = express();
-
+const upload = multer({ storage: multer.memoryStorage() }); // Set the destination folder for uploaded files
 //middleware
 app.use(express.json());
 
 
 
 
-   app.post('/notes', async (req, res) => {
+   app.post('/create-post', upload.single('image'), async (req, res) => {
     const data = req.body;
+    console.log('Received data:', data);
 
-    const note = await noteModel.create({
-        title: data.title,
-        content: data.content
+    const result = await uploadImage(req.file);
+    console.log('Image upload result:', result);
+
+    const post=await postModel.create({
+        image: result.url,
+        caption: data.caption
     });
+    // const data = req.body;
+
+    // const note = await noteModel.create({
+    //     title: data.title,
+    //     content: data.content
+    // });
 
     res.status(201).json({
-        message: 'Note added successfully',
-        data: note
+        message: 'Post Created successfully',
+        data: post
     });
 });
 
