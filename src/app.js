@@ -1,10 +1,14 @@
 //to create a server
 
 const express = require('express');
+//models
 const noteModel = require('./models/note.model');
 const postModel = require('./models/post.model');
 const userModel=require('./models/user.model');
+//routes
 const authRoute=require('./route/auth.route');
+const postRoute=require('./route/post.route');
+//services
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const uploadImage = require('./service/storage.service');
@@ -12,8 +16,9 @@ const app = express();
 const upload = multer({ storage: multer.memoryStorage() }); // Set the destination folder for uploaded files
 //middleware
 app.use(express.json());
-app.use('/api/auth', authRoute);
 app.use(cookieParser());
+app.use('/api/auth', authRoute);
+app.use('/api/post', postRoute);
 
 
 

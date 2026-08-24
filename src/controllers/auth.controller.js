@@ -6,6 +6,12 @@ async function registerUser(req,res){
 
 
     try{
+        const existingUser=await userModel.findOne({email});
+        if(existingUser){
+            return res.status(400).json({
+                message: 'User already exists',
+            })
+        }
         const user=await userModel.create({
             name,email,password
         })
