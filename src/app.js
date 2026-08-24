@@ -3,12 +3,17 @@
 const express = require('express');
 const noteModel = require('./models/note.model');
 const postModel = require('./models/post.model');
+const userModel=require('./models/user.model');
+const authRoute=require('./route/auth.route');
+const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const uploadImage = require('./service/storage.service');
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() }); // Set the destination folder for uploaded files
 //middleware
 app.use(express.json());
+app.use('/api/auth', authRoute);
+app.use(cookieParser());
 
 
 
@@ -37,12 +42,12 @@ app.use(express.json());
     });
 });
 
-app.get('/notes', async (req, res) => {
-    const notes = await noteModel.find();
-    console.log('Sending notes:', notes);
+app.get('/posts', async (req, res) => {
+    const posts = await postModel.find();
+    console.log('Sending posts:', posts);
     res.status(200).json({
-        message: 'Notes retrieved successfully',
-       data: notes
+        message: 'Posts retrieved successfully',
+        data: posts
     });
 
     
@@ -77,6 +82,17 @@ app.patch('/notes/:id',async(req,res)=>{
         message: 'Note updated successfully',
         data: note
     });
+});
+
+// Return a useful response when a client sends invalid JSON.
+app.use((error, req, res, next) => {
+    if (error instanceof SyntaxError && error.status === 400 && 'body' in error) {
+        return res.status(400).json({
+            message: 'Invalid JSON request body'
+        });
+    }
+
+    next(error);
 });
 
 module.exports = app;
